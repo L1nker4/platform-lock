@@ -5,8 +5,8 @@
 				<u-avatar :src="pic" size="140"></u-avatar>
 			</view>
 			<view class="u-flex-1">
-				<view class="u-font-18 u-p-b-20">赵文东</view>
-				<view class="u-font-14 u-tips-color">部门:计算机与软件工程学院</view>
+				<view class="u-font-18 u-p-b-20">{{TeacherName}}</view>
+				<view class="u-font-14 u-tips-color">部门:{{DepartmentName}}</view>
 			</view>
 			<!-- <view class="u-m-l-10 u-p-10">
 				<u-icon name="scan" color="#969799" size="28"></u-icon>
@@ -20,10 +20,10 @@
 				<!-- <u-cell-item icon="star" title="收藏"></u-cell-item>
 				<u-cell-item icon="thumb-up-fill" title="赞赏支持"></u-cell-item> -->
 				<u-cell-item icon="info-circle-fill" title="更新日志"></u-cell-item>
-				<u-cell-item icon="account-fill" title="关于我们"></u-cell-item>
+				<u-cell-item icon="account-fill" title="关于我们" @click="openModal"></u-cell-item>
 			</u-cell-group>
 		</view>
-		
+		<u-modal v-model="show" content="11-309"></u-modal>
 		<!-- <view class="u-m-t-20">
 			<u-cell-group>
 				<u-cell-item icon="setting" title="设置"></u-cell-item>
@@ -37,14 +37,34 @@
 		data() {
 			return {
 				pic:'https://uviewui.com/common/logo.png',
-				show:true
+				show:false,
+				DepartmentName: '',
+				TeacherName: ''
 			}
 		},
 		onLoad() {
-			
+			this.isLogin();
+			this.getData();
 		},
 		methods: {
-			
+			isLogin() {
+				//判断缓存中是否登录过，直接登录
+				const value = uni.getStorageSync('TeacherName');
+				if (!value) {
+					uni.reLaunch({
+						url: '../login/login',
+					});
+				}
+			},
+			getData() {
+				const TeacherName = uni.getStorageSync('TeacherName');
+				const DepartmentName = uni.getStorageSync('DepartmentName');
+				this.TeacherName = TeacherName;
+				this.DepartmentName = DepartmentName;
+			},
+			openModal() {
+				this.show = true;
+			}
 		}
 	}
 </script>

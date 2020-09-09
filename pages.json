@@ -5,14 +5,16 @@
 
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		},
+		{
 			"path": "pages/index/index",
 			"style": {
 				"navigationBarTitleText": "首页"
 			}
-		},
-		{
-			"path": "pages/login/login",
-			"style": {}
 		},
 		{
 			"path": "pages/register/register",
@@ -23,16 +25,12 @@
 				"navigationBarTitleText": "个人中心"
 			}
 		}, {
-			"path": "pages/service/service",
+			"path": "pages/editPassword/editPassword",
 			"style": {
-				"navigationBarTitleText": "服务"
+				"navigationBarTitleText": "密码修改"
 			}
 		}
-	    ,{
-            "path" : "pages/editPassword/editPassword",
-            "style" : {}
-        }
-    ],
+	],
 	"tabBar": {
 		"color": "#666666",
 		"selectedColor": "#666666",
