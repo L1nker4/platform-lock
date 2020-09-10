@@ -16,106 +16,145 @@
 			</u-grid-item> -->
 		</u-grid>
 		<u-gap height="80" bg-color="#bbb"></u-gap>
-		<u-cell-group v-for="(item, index) in RoomName" :key="item">
-			<u-cell-item icon="lock" :title="item" @click="openDoor(item)"></u-cell-item>
-		</u-cell-group>
-
+		<u-cell-group v-for="(item, index) in RoomName" :key="item"><u-cell-item icon="lock" :title="item" @click="openDoor(item)"></u-cell-item></u-cell-group>
 	</div>
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-				list: [
-					"你好，欢迎使用淮阴工学院多媒体锁客户端，",
-					"远程开门有网络延迟，请耐心等待",
-					"请勿短时间内重复开锁"
-				],
-				RoomName: []
-			}
-		},
-		onLoad() {
-			this.isLogin();
-		},
-		methods: {
-			navigatorTo(value) {
-				switch (value) {
-					case '0':
-						uni.navigateTo({
-							url: "../editPassword/editPassword"
-						})
-						break;
-				}
-			},
-			isLogin() {
-				//判断缓存中是否登录过，直接登录
-				let value = uni.getStorageSync('TeacherName');
-				let RoomName = uni.getStorageSync("RoomName");
-				this.RoomName = RoomName;
-				if (!value) {
-					uni.reLaunch({
-						url: '../login/login',
+export default {
+	data() {
+		return {
+			list: ['你好，欢迎使用淮阴工学院多媒体锁客户端，', '远程开门有网络延迟，请耐心等待', '请勿短时间内重复开锁'],
+			RoomName: []
+		};
+	},
+	onLoad() {
+		this.isLogin();
+	},
+	methods: {
+		navigatorTo(value) {
+			switch (value) {
+				case '0':
+					uni.navigateTo({
+						url: '../editPassword/editPassword'
 					});
-				}
-			},
-			openDoor(value) {
-				let TeacherID = uni.getStorageSync("TeacherID");
-				let RoomName = value;
-				let Password = uni.getStorageSync("Password");
-				uni.showModal({
-					title: '提示',
-					content: '您是否确认开锁？',
-					success: function(res) {
-						if (res.confirm) {
-							uni.request({
-								method: "POST",
-								url: "api/DoorLockControl",
-								header: {
-									"content-type": "application/json"
-								},
-								data: {
-									TeacherID: TeacherID,
-									RoomName: RoomName,
-									Password: Password,
-									CtrlMode: 2
-								},
-								success(res) {
-									console.log(res);
-									let data = res.data.Data;
-									if (data.ErrorCode == '0') {
-										//开锁成功
-										uni.showToast({
-											icon: 'success',
-											position: 'center',
-											title: "开锁成功",
-											duration: 2000,
-										});
-									}else {
-										uni.showToast({
-											icon: 'none',
-											position: 'center',
-											title: data.Message,
-											duration: 2000,
-										});
-									}
-								}
-							});
-						} else if (res.cancel) {
-							console.log('用户点击取消');
-						}
-					}
-				});
-				console.log(value);
+					break;
+				case '1':
+					//处理物理卡号申请
+					this.applyNumber();
+					break;
 			}
+		},
+		isLogin() {
+			//判断缓存中是否登录过，直接登录
+			let value = uni.getStorageSync('TeacherName');
+			let RoomName = uni.getStorageSync('RoomName');
+			this.RoomName = RoomName;
+			if (!value) {
+				uni.reLaunch({
+					url: '../login/login'
+				});
+			}
+		},
+		applyNumber() {
+			let TeacherID = uni.getStorageSync('TeacherID');
+			uni.showModal({
+				title: '提示',
+				content: '您确定申请物理卡号变更申请吗？',
+				success: function(res) {
+					if (res.confirm) {
+						uni.request({
+							method: 'POST',
+							url: 'api/UpdateCardNo',
+							header: {
+								'content-type': 'application/json'
+							},
+							data: {
+								TeacherID: TeacherID,
+								CtrlType: '1'
+							},
+							success(res) {
+								let data = res.data.Data;
+								if (data.ErrorCode != '0') {
+									uni.showToast({
+										icon: 'none',
+										position: 'center',
+										title: data.Message,
+										duration: 2000
+									});
+								}else {
+									//成功
+									uni.showToast({
+										icon: 'success',
+										position: 'center',
+										title: '申请成功',
+										duration: 2000
+									});
+								}
+							}
+						});
+					}
+				}
+			});
+			console.log(TeacherID);
+		},
+		openDoor(value) {
+			let TeacherID = uni.getStorageSync('TeacherID');
+			let RoomName = value;
+			let Password = uni.getStorageSync('Password');
+			uni.showModal({
+				title: '提示',
+				content: '您是否确认开锁？',
+				success: function(res) {
+					if (res.confirm) {
+						uni.request({
+							method: 'POST',
+							url: 'api/DoorLockControl',
+							header: {
+								'content-type': 'application/json'
+							},
+							data: {
+								TeacherID: TeacherID,
+								RoomName: RoomName,
+								Password: Password,
+								CtrlMode: 2
+							},
+							success(res) {
+								console.log(res);
+								let data = res.data.Data;
+								if (data.ErrorCode == '0') {
+									//开锁成功
+									uni.showToast({
+										icon: 'success',
+										position: 'center',
+										title: '开锁成功',
+										duration: 2000
+									});
+								} else {
+									uni.showToast({
+										icon: 'none',
+										position: 'center',
+										title: data.Message,
+										duration: 2000
+									});
+								}
+							}
+						});
+					} else if (res.cancel) {
+						console.log('用户点击取消');
+					}
+				}
+			});
+			console.log(value);
 		}
 	}
+};
 </script>
 
 <style scoped lang="scss">
-	.grid-text {
-		font-size: 28rpx;
-		margin-top: 4rpx;
-		color: $u-type-info;
-	}
+.grid-text {
+	font-size: 28rpx;
+	margin-top: 4rpx;
+	color: $u-type-info;
+}
 </style>

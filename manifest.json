@@ -1,5 +1,5 @@
 {
-    "name" : "platform-app",
+    "name" : "淮工智锁",
     "appid" : "__UNI__78B392E",
     "description" : "",
     "versionName" : "1.0.0",
@@ -77,11 +77,11 @@
     },
     "h5" : {
         "devServer" : {
-            "port" : 8000,
+            "port" : 81,
             "disableHostCheck" : true,
             "proxy" : {
                 "/api" : {
-                    "target" : "http://172.16.5.55:8181/",
+                    "target" : "http://dmtjs.hyit.edu.cn:8181",
                     "changeOrigin" : true,
                     "secure" : false
                 }
@@ -90,6 +90,12 @@
         },
         "uniStatistics" : {
             "enable" : true
-        }
+        },
+        "title" : "淮工智锁",
+        "router" : {
+            "mode" : "hash",
+            "base" : "./"
+        },
+        "domain" : "172.16.5.55"
     }
 }
