@@ -119,13 +119,13 @@
 														icon: 'success',
 														position: 'center',
 														title: "登录成功",
-														duration: 2000,
+														duration: 1000,
 													});
 													setTimeout(function() {
 														uni.reLaunch({
 															url: "../index/index"
 														})
-													}, 2000)
+													}, 1000)
 												} else {
 													uni.showToast({
 														icon: 'none',
