@@ -52,7 +52,7 @@
 					const value = uni.getStorageSync('TeacherName');
 					if (value) {
 						//有登录信息
-						console.log("已登录用户：",value);
+						console.log("已登录用户：", value);
 						uni.reLaunch({
 							url: '../index/index',
 						});
@@ -69,47 +69,95 @@
 				}
 				uni.request({
 					method: "POST",
-					url: "api/SystemLogin",
-					header: {
-						"content-type": "application/json"
-					},
+					url: "/auth-server/jwt/token/login",
 					data: {
-						TeacherID: this.TeacherID,
-						Password: this.Password
+						username: this.TeacherID,
+						password: this.Password
+					},
+					header: {
+						"content-type": "application/x-www-form-urlencoded"
 					},
 					success(res) {
-						console.log(res);
-						let data = res.data.Data
-						if (data.ErrorCode == '0') {
-							//登录成功
-							uni.setStorageSync("DepartmentName", data.DepartmentName)
-							uni.setStorageSync("TeacherName", data.TeacherName)
-							uni.setStorageSync("RoomName", data.RoomName)
-							console.log(data.RoomName)
-							uni.setStorageSync("TeacherID", _this.TeacherID)
-							uni.setStorageSync("Password", _this.Password)
-							uni.showToast({
-								icon: 'success',
-								position: 'center',
-								title: "登录成功",
-								duration: 2000,
-							});
-							setTimeout(function() {
-								uni.reLaunch({
-									url: "../index/index"
-								})
-							}, 2000)
+						// console.log(res);
+						if (res.statusCode == 200) {
+							let token = "JWTToken " + res.data;
+							console.log(token);
+							//获取用户工号
+							uni.setStorageSync("Token", token);
+							uni.request({
+								method: "GET",
+								url: "/auth-server/api/user",
+								header: {
+									"Authorization": token
+								},
+								success(res) {
+									if (res.statusCode == 200) {
+										//token校验通过
+										let TeacherID = res.data.username;
+										uni.setStorageSync("TeacherID", TeacherID);
+										uni.request({
+											method: "POST",
+											url: "api/SystemLogin",
+											header: {
+												"content-type": "application/json"
+											},
+											data: {
+												TeacherID: TeacherID,
+												Password: "1234567"
+											},
+											success(res) {
+												console.log(res);
+												let data = res.data.Data
+												if (data.ErrorCode == '0') {
+													//登录成功
+													uni.setStorageSync("DepartmentName", data.DepartmentName)
+													uni.setStorageSync("TeacherName", data.TeacherName)
+													uni.setStorageSync("RoomName", data.RoomName)
+													console.log(data.RoomName)
+													uni.setStorageSync("Password", _this.Password)
+													uni.showToast({
+														icon: 'success',
+														position: 'center',
+														title: "登录成功",
+														duration: 2000,
+													});
+													setTimeout(function() {
+														uni.reLaunch({
+															url: "../index/index"
+														})
+													}, 2000)
+												} else {
+													uni.showToast({
+														icon: 'none',
+														position: 'center',
+														title: res.data.Data.Message,
+														duration: 2000,
+													});
+												}
+											}
+										})
+									} else {
+										uni.showToast({
+											icon: 'none',
+											position: 'center',
+											title: "token已过期，请重试",
+											duration: 2000,
+										});
+									}
+
+								}
+							})
 						} else {
 							uni.showToast({
 								icon: 'none',
 								position: 'center',
-								title: res.data.Data.Message,
+								title: "登录失败，用户名或密码错误",
 								duration: 2000,
 							});
 						}
 					}
-				})
 
+				})
 				_this.isRotate = true
 				setTimeout(function() {
 					_this.isRotate = false

@@ -24,11 +24,11 @@
 			</u-cell-group>
 		</view>
 		<u-modal v-model="show" content="11-309"></u-modal>
-		<!-- <view class="u-m-t-20">
+		<view class="u-m-t-20">
 			<u-cell-group>
-				<u-cell-item icon="setting" title="设置"></u-cell-item>
+				<u-cell-item icon="close" title="退出" @click="logout()"></u-cell-item>
 			</u-cell-group>
-		</view> -->
+		</view>
 	</view>
 </template>
 
@@ -36,8 +36,8 @@
 	export default {
 		data() {
 			return {
-				pic:'https://uviewui.com/common/logo.png',
-				show:false,
+				pic: 'https://uviewui.com/common/logo.png',
+				show: false,
 				DepartmentName: '',
 				TeacherName: ''
 			}
@@ -64,25 +64,45 @@
 			},
 			openModal() {
 				this.show = true;
+			},
+			logout() {
+				uni.showModal({
+					title: "提示",
+					content: "您是否要退出吗？",
+					success: function(res) {
+						if (res.confirm) {
+							uni.removeStorageSync("DepartmentName");
+							uni.removeStorageSync("Password");
+							uni.removeStorageSync("RoomName");
+							uni.removeStorageSync("TeacherID");
+							uni.removeStorageSync("TeacherName");
+							uni.removeStorageSync("Token");
+							uni.reLaunch({
+								url:"../login/login"
+							})
+						}
+					}
+				})
 			}
 		}
 	}
 </script>
 
 <style lang="scss">
-page{
-	background-color: #ededed;
-}
-
-.camera{
-	width: 54px;
-	height: 44px;
-	
-	&:active{
+	page {
 		background-color: #ededed;
 	}
-}
-.user-box{
-	background-color: #fff;
-}
+
+	.camera {
+		width: 54px;
+		height: 44px;
+
+		&:active {
+			background-color: #ededed;
+		}
+	}
+
+	.user-box {
+		background-color: #fff;
+	}
 </style>
